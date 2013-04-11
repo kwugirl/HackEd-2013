@@ -39,6 +39,16 @@
 
 {% block content %}
 <section class="clearfix" id="samples">
+
+<!-- Added this div to display interests that I pulled in exampleapp.py
+ --><div> 
+  You are interested in: 
+
+  {% for interest in interests_list %}
+            {{interest}}, 
+  {% endfor %}
+</div>
+
       <h1>Examples of the Facebook Graph API</h1>
       <div class="list">
         <h3>A few of your friends</h3>
@@ -50,22 +60,7 @@
           </a>
         </li>{% endfor %}</ul>
       </div>
-      <div class="list inline">
-        <h3>Recent photos</h3>
-        <ul class="photos">
-          {% for photo in photos.data %}
-            {% if loop.index0%4 == 0 %}
-          <li class="first-column" style="background-image: url({{photo.picture}})">
-            {% else %}
-          <li style="background-image: url({{photo.picture}})">
-            {% endif %}
-            <a href="#" onclick="window.open('http://www.facebook.com/{{photo.id}}')">
-              {{photo.name}}
-            </a>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
+
       <div class="list">
         <h3>Things you like</h3>
         <ul class="things">{% for like in likes.data %}
@@ -76,6 +71,16 @@
           </a>
         </li>{% endfor %}</ul>
       </div>
+
+      <div class="list">
+        <h3>Within interests, your likes</h3>
+        <ul class="things">{% for interest in interests_list %}
+        <li>
+            {{interest}}
+          </a>
+        </li>{% endfor %}</ul>
+      </div>
+
       <div class="list">
         <h3>Friends using this app</h3>
         <ul class="friends">{% for friend in app_friends %}
@@ -86,5 +91,7 @@
             </a>
         </li>{% endfor %}</ul>
       </div>
+
+
     </section>
 {% endblock%}

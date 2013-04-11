@@ -12,12 +12,12 @@ from base64 import urlsafe_b64decode, urlsafe_b64encode
 import requests
 from flask import Flask, request, redirect, render_template, url_for
 
-FB_APP_ID = os.environ.get('FACEBOOK_APP_ID')
+FB_APP_ID = 111674485669729
 requests = requests.session()
 
 app_url = 'https://graph.facebook.com/{0}'.format(FB_APP_ID)
 FB_APP_NAME = json.loads(requests.get(app_url).content).get('name')
-FB_APP_SECRET = os.environ.get('FACEBOOK_SECRET')
+FB_APP_SECRET = "3a4e908103f6ac2a9f143b5ed6533b50"
 
 
 def oauth_login_url(preserve_path=True, next_url=None):
@@ -164,7 +164,6 @@ def get_token():
 def index():
     # print get_home()
 
-
     access_token = get_token()
     channel_url = url_for('get_channel', _external=True)
     channel_url = channel_url.replace('http:', '').replace('https:', '')
@@ -175,6 +174,14 @@ def index():
         fb_app = fb_call(FB_APP_ID, args={'access_token': access_token})
         likes = fb_call('me/likes',
                         args={'access_token': access_token, 'limit': 4})
+
+        # this is the part that I added
+        interests_list = []
+        for like in likes['data']:
+            if like['category'] == "Interest":
+                interests_list.append(like['name'])
+
+
         friends = fb_call('me/friends',
                           args={'access_token': access_token, 'limit': 4})
         photos = fb_call('me/photos',
@@ -200,7 +207,7 @@ def index():
             'index.html', app_id=FB_APP_ID, token=access_token, likes=likes,
             friends=friends, photos=photos, app_friends=app_friends, app=fb_app,
             me=me, POST_TO_WALL=POST_TO_WALL, SEND_TO=SEND_TO, url=url,
-            channel_url=channel_url, name=FB_APP_NAME)
+            channel_url=channel_url, name=FB_APP_NAME, interests_list = interests_list)
     else:
         return render_template('login.html', app_id=FB_APP_ID, token=access_token, url=request.url, channel_url=channel_url, name=FB_APP_NAME)
 
@@ -216,6 +223,6 @@ def close():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     if app.config.get('FB_APP_ID') and app.config.get('FB_APP_SECRET'):
-        app.run(host='0.0.0.0', port=port)
+        app.run(host='localhost', port=port)
     else:
         print 'Cannot start application without Facebook App Id and Secret set'
